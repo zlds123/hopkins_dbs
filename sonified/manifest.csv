@@ -1,0 +1,12 @@
+label,kind,wav,png,real_sec,audio_sec,out_rate,desc
+reach_active,reach contrast,contrast__reach_active.wav,contrast__reach_active.png,24.0,10.0,22050,3 reach onsets in this window -- listen for the hum ducking with repeated crackles | 20 burst-notes
+rest_quiet,reach contrast,contrast__rest_quiet.wav,contrast__rest_quiet.png,24.0,10.0,22050,no reaches -- steady resting hum (beta idle rhythm) | 0 burst-notes
+"Talk, TV",behavior,behavior__Talk__TV.wav,behavior__Talk__TV.png,24.0,10.0,22050,"coarse-behavior epoch: Talk, TV | 9 burst-notes"
+TV,behavior,behavior__TV.wav,behavior__TV.png,24.0,10.0,22050,coarse-behavior epoch: TV | 19 burst-notes
+Inactive,behavior,behavior__Inactive.wav,behavior__Inactive.png,24.0,10.0,22050,coarse-behavior epoch: Inactive | 26 burst-notes
+"Eat, Talk",behavior,behavior__Eat__Talk.wav,behavior__Eat__Talk.png,24.0,10.0,22050,"coarse-behavior epoch: Eat, Talk | 23 burst-notes"
+Other activity,behavior,behavior__Other_activity.wav,behavior__Other_activity.png,24.0,10.0,22050,coarse-behavior epoch: Other activity | 1 burst-notes
+Computer/phone,behavior,behavior__Computer_phone.wav,behavior__Computer_phone.png,24.0,10.0,22050,coarse-behavior epoch: Computer/phone | 17 burst-notes
+"Eat, TV",behavior,behavior__Eat__TV.wav,behavior__Eat__TV.png,24.0,10.0,22050,"coarse-behavior epoch: Eat, TV | 7 burst-notes"
+Sleep/rest,behavior,behavior__Sleep_rest.wav,behavior__Sleep_rest.png,24.0,10.0,22050,coarse-behavior epoch: Sleep/rest | 1 burst-notes
+Talk,behavior,behavior__Talk.wav,behavior__Talk.png,24.0,10.0,22050,coarse-behavior epoch: Talk | 1 burst-notes

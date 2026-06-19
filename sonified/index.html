@@ -1,0 +1,79 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>ECoG sonification</title>
+<style>
+ body{font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:860px;margin:30px auto;color:#1a1a1a}
+ h1{font-size:22px} .meta{color:#555;font-size:13px;margin-bottom:24px}
+ .clip{border:1px solid #e2e2e2;border-radius:10px;padding:14px 16px;margin:14px 0}
+ .label{font-weight:600;font-size:16px} .desc{color:#555;font-size:13px;margin:4px 0 10px}
+ audio{width:100%;margin:6px 0} img{width:100%;border-radius:6px;margin-top:8px}
+ .tag{display:inline-block;background:#eef;border-radius:6px;padding:1px 8px;font-size:12px;margin-left:8px}
+</style></head><body>
+<h1>What the brain sounds like when it moves a hand</h1>
+<div class="meta">Source: sub-01_ses-3_behavior+ecephys.nwb | channel 71 (MNI (-58,1,17)) | MODE: music (parameter-mapping) | 5 bands -&gt; C-major chord voices, high-gamma bursts -&gt; plucked notes | 24s brain -&gt; 10s audio</div>
+<div class="clip">
+<div class="label">reach_active<span class="tag">reach contrast</span></div>
+<div class="desc">3 reach onsets in this window -- listen for the hum ducking with repeated crackles | 20 burst-notes</div>
+<audio controls preload="none" src="contrast__reach_active.wav"></audio>
+<img loading="lazy" src="contrast__reach_active.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">rest_quiet<span class="tag">reach contrast</span></div>
+<div class="desc">no reaches -- steady resting hum (beta idle rhythm) | 0 burst-notes</div>
+<audio controls preload="none" src="contrast__rest_quiet.wav"></audio>
+<img loading="lazy" src="contrast__rest_quiet.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Talk, TV<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Talk, TV | 9 burst-notes</div>
+<audio controls preload="none" src="behavior__Talk__TV.wav"></audio>
+<img loading="lazy" src="behavior__Talk__TV.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">TV<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: TV | 19 burst-notes</div>
+<audio controls preload="none" src="behavior__TV.wav"></audio>
+<img loading="lazy" src="behavior__TV.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Inactive<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Inactive | 26 burst-notes</div>
+<audio controls preload="none" src="behavior__Inactive.wav"></audio>
+<img loading="lazy" src="behavior__Inactive.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Eat, Talk<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Eat, Talk | 23 burst-notes</div>
+<audio controls preload="none" src="behavior__Eat__Talk.wav"></audio>
+<img loading="lazy" src="behavior__Eat__Talk.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Other activity<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Other activity | 1 burst-notes</div>
+<audio controls preload="none" src="behavior__Other_activity.wav"></audio>
+<img loading="lazy" src="behavior__Other_activity.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Computer/phone<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Computer/phone | 17 burst-notes</div>
+<audio controls preload="none" src="behavior__Computer_phone.wav"></audio>
+<img loading="lazy" src="behavior__Computer_phone.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Eat, TV<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Eat, TV | 7 burst-notes</div>
+<audio controls preload="none" src="behavior__Eat__TV.wav"></audio>
+<img loading="lazy" src="behavior__Eat__TV.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Sleep/rest<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Sleep/rest | 1 burst-notes</div>
+<audio controls preload="none" src="behavior__Sleep_rest.wav"></audio>
+<img loading="lazy" src="behavior__Sleep_rest.png" alt="spectrogram">
+</div>
+<div class="clip">
+<div class="label">Talk<span class="tag">behavior</span></div>
+<div class="desc">coarse-behavior epoch: Talk | 1 burst-notes</div>
+<audio controls preload="none" src="behavior__Talk.wav"></audio>
+<img loading="lazy" src="behavior__Talk.png" alt="spectrogram">
+</div>
+</body></html>
