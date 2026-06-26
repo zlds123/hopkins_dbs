@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phase 2 feasibility, explained</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #f9fafb;
+    --panel2: #f3f4f6;
+    --stroke: #e5e7eb;
+    --stroke2: #d1d5db;
+    --text: #111827;
+    --text2: #374151;
+    --text3: #6b7280;
+    --faint: #9ca3af;
+    --accent: #d97706;
+    --gray: #6b7280;
+    --blue: #2563eb;
+    --green: #16a34a;
+    --info-bg: #eff6ff;
+    --info-bd: #bfdbfe;
+    --warn-bg: #fffbeb;
+    --warn-bd: #fde68a;
+    --ok-bg: #ecfdf5;
+    --ok-bd: #a7f3d0;
+    --neutral-bg: #f3f4f6;
+    --danger: #dc2626;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0d10;
+      --panel: #14171c;
+      --panel2: #1b1f26;
+      --stroke: #262b33;
+      --stroke2: #333a44;
+      --text: #f3f4f6;
+      --text2: #d1d5db;
+      --text3: #9ca3af;
+      --faint: #6b7280;
+      --accent: #f59e0b;
+      --gray: #9ca3af;
+      --blue: #60a5fa;
+      --green: #34d399;
+      --info-bg: #11203a;
+      --info-bd: #1e3a5f;
+      --warn-bg: #2a2103;
+      --warn-bd: #5a4708;
+      --ok-bg: #06251b;
+      --ok-bd: #0c4f3a;
+      --neutral-bg: #1b1f26;
+      --danger: #f87171;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 24px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  h2 { font-size: 18px; margin: 28px 0 10px; letter-spacing: -0.01em; }
+  h3 { font-size: 14px; margin: 22px 0 8px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text3); }
+  p { margin: 0 0 12px; color: var(--text2); }
+  .lead { color: var(--text2); font-size: 15px; }
+  .muted { color: var(--text3); }
+  .small { font-size: 13px; }
+  .divider { height: 1px; background: var(--stroke); margin: 24px 0; border: 0; }
+
+  .callout { border: 1px solid var(--stroke2); border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+  .callout .title { font-weight: 600; margin-bottom: 4px; }
+  .callout.info { background: var(--info-bg); border-color: var(--info-bd); }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-bd); }
+  .callout.ok { background: var(--ok-bg); border-color: var(--ok-bd); }
+  .callout.neutral { background: var(--neutral-bg); }
+
+  .card { border: 1px solid var(--stroke); border-radius: 10px; background: var(--panel); overflow: hidden; }
+  .card .head { padding: 10px 14px; border-bottom: 1px solid var(--stroke); font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card .body { padding: 14px; }
+
+  .pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--panel2); color: var(--text3); border: 1px solid var(--stroke); white-space: nowrap; }
+  .pill.active { background: var(--accent); color: #1a1a1a; border-color: transparent; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 6px 0; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--stroke); vertical-align: top; }
+  th { color: var(--text3); font-weight: 600; font-size: 12px; }
+  tbody tr:nth-child(odd) { background: var(--panel2); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.info td { background: var(--info-bg); }
+  tr.ok td { color: var(--green); }
+  tr.danger td { color: var(--danger); }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .flow .step { border: 1px solid var(--stroke2); border-radius: 6px; padding: 6px 10px; background: var(--panel2); min-width: 120px; }
+  .flow .step b { display: block; font-size: 13px; }
+  .flow .step span { font-size: 12px; color: var(--text3); }
+  .flow .arrow { color: var(--faint); }
+
+  .diagram-scroll { overflow-x: auto; }
+  svg { display: block; }
+  b.k { font-weight: 600; }
+  footer { margin-top: 40px; color: var(--faint); font-size: 12px; }
+  a { color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Phase 2 feasibility, explained</h1>
+  <p class="lead">
+    A &ldquo;pseudo-online replay&rdquo; feeds the recording back in time order, as if it were
+    arriving live, and asks three decoders to predict movement-vs-rest one block at a time. The only
+    difference between the decoders is how they learn. Two experiments test (1) whether the data
+    drifts on its own and (2) whether adaptation rescues accuracy when it does.
+  </p>
+
+  <div class="callout warn">
+    <div class="title">Read this first: AJILE12 here is a feasibility control, not the main result</div>
+    <div class="small">
+      AJILE12 has no stimulation and little within-session drift, so it cannot test online adaptation
+      on its own. Its role is to prove the streaming machinery is correct. The real Phase 2 runs on
+      the DARPA RAM dataset (ds005557), which has logged closed-loop stimulation and outcomes &mdash;
+      see the last section.
+    </div>
+  </div>
+
+  <h2>The replay, sliced in one picture</h2>
+  <div class="card">
+    <div class="head">How time is cut into blocks, and what each decoder trains on</div>
+    <div class="body diagram-scroll">
+      <div id="diagram"></div>
+    </div>
+  </div>
+
+  <h3>End-to-end pipeline</h3>
+  <div class="flow">
+    <div class="step"><b>Raw ECoG</b><span>15 GB, read in chunks</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="step"><b>Features</b><span>&beta; + high-&gamma; power, 20 Hz</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="step"><b>Warm-up</b><span>train decoder on first 15 min</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="step"><b>Replay loop</b><span>predict &rarr; then learn, block by block</span></div>
+    <span class="arrow">&rarr;</span>
+    <div class="step"><b>Metrics</b><span>AUC per block + drift</span></div>
+  </div>
+
+  <hr class="divider" />
+
+  <h2>The three decoders &mdash; the only difference is when they learn</h2>
+  <table>
+    <thead>
+      <tr><th>Decoder</th><th>When it learns</th><th>What it remembers</th><th>Analogy</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b class="k">static</b></td>
+        <td>Once, on the warm-up. Then frozen.</td>
+        <td>Only the warm-up period.</td>
+        <td>Study for the test once, never review again.</td>
+      </tr>
+      <tr>
+        <td><b class="k">online-SGD</b></td>
+        <td>A small weight nudge after every block.</td>
+        <td>All past blocks (fading memory).</td>
+        <td>Review a little every day; old lessons slowly fade.</td>
+      </tr>
+      <tr>
+        <td><b class="k">sliding-refit</b></td>
+        <td>Throws away the old model; retrains from scratch on the last K blocks before each test.</td>
+        <td>Only the most recent K blocks.</td>
+        <td>Re-study from scratch using just this week&rsquo;s notes.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="small muted">
+    <b class="k">online vs sliding:</b> both adapt, but differently. <b class="k">online-SGD</b> is
+    incremental &mdash; it keeps one model alive forever and edits it gently, so it carries long
+    memory but reacts slowly. <b class="k">sliding-refit</b> is amnesiac &mdash; it rebuilds a
+    brand-new model from only the recent window, so it reacts fast to change but forgets old structure.
+  </p>
+
+  <hr class="divider" />
+
+  <h2>Two experiments, told simply</h2>
+  <div class="grid2">
+    <div class="card">
+      <div class="head">1 &middot; Observed (within-session) <span class="pill">real data</span></div>
+      <div class="body">
+        <p class="small">
+          Just replay ~75 minutes of one real recording and decode movement. Nothing is tampered
+          with. Question: <b class="k">does the brain signal drift on its own within a session?</b>
+        </p>
+        <table>
+          <thead><tr><th>Decoder</th><th class="num">AUC</th></tr></thead>
+          <tbody>
+            <tr class="info"><td>static (frozen)</td><td class="num">0.626</td></tr>
+            <tr><td>online-SGD</td><td class="num">0.631</td></tr>
+            <tr><td>sliding-refit</td><td class="num">0.649</td></tr>
+            <tr class="danger"><td>null (shuffled)</td><td class="num">0.514</td></tr>
+          </tbody>
+        </table>
+        <p class="small muted">Static even <b class="k">improved</b> over time (0.58 &rarr; 0.65). Adapting barely helped (+0.02).</p>
+        <div class="callout neutral">
+          <div class="small"><b class="k">Proves:</b> movement is decodable, but within a single
+          session the signal is basically stable &mdash; so adaptation isn&rsquo;t really needed here.
+          (This is the honest point that backs the mentors&rsquo; doubt.)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color: var(--accent);">
+      <div class="head">2 &middot; Induced drift (rotation) <span class="pill active">positive control</span></div>
+      <div class="body">
+        <p class="small">
+          Same data, but we deliberately and gradually <b class="k">scramble how the signal is laid
+          out</b> over time (a rotation that keeps the information but moves it around). Question:
+          <b class="k">if drift does happen, does adapting rescue us?</b>
+        </p>
+        <table>
+          <thead><tr><th>Decoder</th><th class="num">AUC</th></tr></thead>
+          <tbody>
+            <tr class="danger"><td>static (frozen)</td><td class="num">0.533</td></tr>
+            <tr class="ok"><td>online-SGD</td><td class="num">0.607</td></tr>
+            <tr class="ok"><td>sliding-refit</td><td class="num">0.626</td></tr>
+            <tr><td>null (shuffled)</td><td class="num">0.514</td></tr>
+          </tbody>
+        </table>
+        <p class="small muted">Static <b class="k">collapsed</b> toward chance (0.55 &rarr; 0.52); the adaptive decoders held ~0.61&ndash;0.63.</p>
+        <div class="callout ok">
+          <div class="small"><b class="k">Proves:</b> when drift reorganizes the signal, a frozen
+          decoder breaks and the adaptive ones recover. The adaptation machinery works &mdash; the
+          open question is whether real drift (e.g. across RAM&rsquo;s logged sessions) is this strong.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <h2>Where Phase 2 actually runs: RAM (ds005557)</h2>
+  <p class="muted">
+    AJILE12 only lets a decoder watch behavior &mdash; it never acted on the brain. To study online
+    adaptation of a real control loop, Phase 2 moves to the DARPA RAM closed-loop iEEG corpus, where
+    a classifier actually decided when to stimulate and every action and outcome was logged. That
+    lets the recorded outcomes be reused to score a new policy, with no synthetic brain model.
+  </p>
+  <div class="grid2">
+    <div class="card">
+      <div class="head">RAM as a logged decision loop</div>
+      <div class="body">
+        <table>
+          <thead><tr><th>Loop piece</th><th>What it is in RAM</th></tr></thead>
+          <tbody>
+            <tr><td>behavior policy</td><td>the encoding classifier that triggered stim</td></tr>
+            <tr><td>action</td><td>stim / no-stim + logged parameters</td></tr>
+            <tr><td>observation</td><td>iEEG features at encoding</td></tr>
+            <tr><td>outcome (reward)</td><td>word later recalled, or not</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="head">Off-policy action-matching</div>
+      <div class="body">
+        <p class="small">
+          The candidate decoder proposes an action at each step. We trust the logged outcome only
+          where its action <b class="k">matches</b> what was actually delivered; where they diverge,
+          the recorded future no longer applies.
+        </p>
+        <div class="callout warn">
+          <div class="title small">Gating risk: the match rate</div>
+          <div class="small">This only works if the agent and the logged policy agree often enough to
+          leave a usable sample. The first step in Phase 2 is to measure that match rate before
+          anything else &mdash; if it is too low, OPE is underpowered.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callout info">
+    <div class="title">Translation target</div>
+    <div class="small">
+      The clinical endpoint is psychiatric DBS (e.g. the Provenza OCD and Summit RC+S programs on
+      DABI), where drift spans days&ndash;weeks and stimulation is logged &mdash; but access is gated
+      and raw audio/video is excluded, so RAM is the open bridge for the method.
+    </div>
+  </div>
+
+  <div class="callout info">
+    <div class="title">The one-sentence takeaway</div>
+    <div class="small">
+      On AJILE12 the harness works and movement is decodable, but within-session drift is too small
+      to need adaptation; the rotation control proves adaptation rescues accuracy when drift is real
+      &mdash; so Phase 2 moves to RAM (ds005557), where logged closed-loop stimulation makes online
+      adaptation and off-policy evaluation an honest test.
+    </div>
+  </div>
+
+  <footer>
+    Exported from the Cursor canvas <code>phase2-feasibility-explainer</code>. Results from
+    <code>phase2_feasibility.py</code> on AJILE12 (observed within-session + induced-rotation control).
+  </footer>
+</div>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var css = function (v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); };
+  var accent = css("--accent"), gray = css("--gray"), blue = css("--blue"),
+      green = css("--green"), txt = css("--text2"), faint = css("--faint"),
+      stroke = css("--stroke2"), fill = css("--panel2");
+
+  var NB = 30, WARM = 5, K = 5, I = 20;
+  var x0 = 44, bw = 16, blockW = 13, stripY = 64, stripH = 18;
+  var bx = function (i) { return x0 + i * bw; };
+  var labelX = bx(NB) + 14;
+  var width = labelX + 230, height = 214;
+
+  function el(tag, attrs, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  var svg = el("svg", { width: width, height: height, viewBox: "0 0 " + width + " " + height });
+
+  // brackets
+  svg.appendChild(el("text", { x: bx(0), y: 28, "font-size": 11, fill: txt, "font-weight": 600 }, "warm-up"));
+  svg.appendChild(el("text", { x: bx(0), y: 42, "font-size": 10, fill: faint }, "train once (blocks 0\u20134)"));
+  svg.appendChild(el("line", { x1: bx(0) + 1, y1: 48, x2: bx(WARM) - 3, y2: 48, stroke: accent, "stroke-width": 1.5 }));
+  svg.appendChild(el("text", { x: bx(WARM) + 4, y: 28, "font-size": 11, fill: txt, "font-weight": 600 }, "streaming evaluation"));
+  svg.appendChild(el("text", { x: bx(WARM) + 4, y: 42, "font-size": 10, fill: faint }, "blocks 5\u201329, in time order \u2192"));
+  svg.appendChild(el("line", { x1: bx(WARM) + 1, y1: 48, x2: bx(NB) - 3, y2: 48, stroke: stroke, "stroke-width": 1.5 }));
+
+  // block strip
+  for (var i = 0; i < NB; i++) {
+    var isWarm = i < WARM, isTest = i === I;
+    svg.appendChild(el("rect", {
+      x: bx(i) + 1, y: stripY, width: blockW, height: stripH, rx: 2,
+      fill: isWarm ? accent : fill,
+      stroke: isTest ? accent : "none",
+      "stroke-width": isTest ? 2 : 0
+    }));
+  }
+  svg.appendChild(el("text", { x: bx(I) + blockW / 2 + 1, y: stripY - 4, "font-size": 9, fill: accent, "text-anchor": "middle", "font-weight": 600 }, "TEST"));
+  svg.appendChild(el("text", { x: bx(0), y: stripY + stripH + 14, "font-size": 9.5, fill: faint }, "each block = 3 min of brain + behavior features (20 Hz)"));
+
+  // vertical guide
+  svg.appendChild(el("line", { x1: bx(I) + 1, y1: stripY - 14, x2: bx(I) + 1, y2: 190, stroke: accent, "stroke-width": 0.8, "stroke-dasharray": "3 3", opacity: 0.6 }));
+
+  function lane(y, a, b, color) {
+    svg.appendChild(el("rect", { x: bx(a) + 1, y: y, width: bx(b) - bx(a) - (bw - blockW) - 1, height: 12, rx: 2, fill: color, opacity: 0.85 }));
+  }
+
+  // static
+  lane(108, 0, WARM, gray);
+  svg.appendChild(el("text", { x: labelX, y: 117, "font-size": 11, fill: txt }, "static \u2014 frozen after warm-up"));
+
+  // online + ticks
+  lane(126, 0, I, blue);
+  for (var j = WARM; j < I; j++) {
+    svg.appendChild(el("circle", { cx: bx(j) + 1 + blockW / 2, cy: 148, r: 2.2, fill: blue }));
+  }
+  svg.appendChild(el("text", { x: labelX, y: 135, "font-size": 11, fill: txt }, "online-SGD \u2014 nudged after every block"));
+  svg.appendChild(el("text", { x: labelX, y: 149, "font-size": 9.5, fill: faint }, "keeps memory of all past blocks"));
+
+  // sliding
+  lane(166, I - K, I, green);
+  svg.appendChild(el("text", { x: labelX, y: 175, "font-size": 11, fill: txt }, "sliding-refit \u2014 retrains on last " + K + " blocks"));
+  svg.appendChild(el("text", { x: labelX, y: 189, "font-size": 9.5, fill: faint }, "forgets everything older"));
+
+  svg.appendChild(el("text", { x: bx(0), y: 206, "font-size": 9.5, fill: faint }, "Order per block: (1) PREDICT the test block \u2192 score it, then (2) LEARN from it. Never sees the future."));
+
+  document.getElementById("diagram").appendChild(svg);
+})();
+</script>
+</body>
+</html>
