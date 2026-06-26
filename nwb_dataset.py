@@ -348,3 +348,309 @@ def build_feature_matrix(dataset, bands=BANDS, include_pose=True, verbose=True):
         if verbose and (i + 1) % 50 == 0:
             print(f"  processed {i + 1}/{n} windows")
     return np.asarray(X), np.asarray(y), names
+
+
+# --------------------------------------------------------------------------- #
+# Continuous feature stream (for CEBRA and other latent-variable models)
+# --------------------------------------------------------------------------- #
+def _interp_nan(a):
+    """Linearly interpolate NaNs along axis 0 of a (T, k) array (per column)."""
+    a = np.asarray(a, dtype=float).copy()
+    if a.ndim == 1:
+        a = a[:, None]
+    t = np.arange(a.shape[0])
+    for c in range(a.shape[1]):
+        col = a[:, c]
+        m = np.isfinite(col)
+        if m.sum() == 0:
+            col[:] = 0.0
+        elif m.sum() < col.size:
+            col[~m] = np.interp(t[~m], t[m], col[m])
+        a[:, c] = col
+    return a
+
+
+def find_active_window(path, dur_sec=3600.0, step_sec=300.0):
+    """Find the ``dur_sec`` window containing the most reach onsets.
+
+    Returns ``(t_start, t_stop, n_reaches)``. Sleep/blocklist-heavy spans are
+    naturally avoided because they contain no reaches.
+    """
+    with h5py.File(path, "r") as f:
+        reaches = _read_intervals(f, "reaches")
+        if reaches is None:
+            raise ValueError("No /intervals/reaches in this file.")
+        fs, _ = _series_rate(f, "acquisition/ElectricalSeries", 500.0)
+        T = f["acquisition/ElectricalSeries/data"].shape[0] / fs
+    onsets = np.sort(np.asarray(reaches["start_time"], dtype=float))
+
+    best_t, best_n = 0.0, -1
+    t = 0.0
+    while t + dur_sec <= T:
+        n = int(np.sum((onsets >= t) & (onsets < t + dur_sec)))
+        if n > best_n:
+            best_t, best_n = t, n
+        t += step_sec
+    return best_t, best_t + dur_sec, best_n
+
+
+def find_movement_window(path, dur_sec=1800.0, step_sec=120.0, keypoint="R_Wrist",
+                         speed_pct=80, min_valid=0.5):
+    """Find the ``dur_sec`` window richest in *actual wrist movement*.
+
+    Scores each candidate by the fraction of **valid** (non-occluded) frames whose
+    wrist speed exceeds a global high-speed threshold (``speed_pct`` percentile).
+    Windows with poor pose coverage (< ``min_valid``) are skipped, so we don't pick
+    a span that merely looks fast because of occlusion-interpolation jumps.
+
+    Returns ``(t_start, t_stop, score)``.
+    """
+    with h5py.File(path, "r") as f:
+        prate, pt0 = _series_rate(f, "processing/behavior/Position/" + keypoint, 30.0)
+        d = f["processing/behavior/Position/" + keypoint + "/data"][:]
+    valid = np.isfinite(d).all(axis=1)
+    xy = _interp_nan(d)
+    v = np.gradient(xy, 1.0 / prate, axis=0)
+    speed = np.sqrt((v ** 2).sum(axis=1))
+    speed[~valid] = np.nan
+    thr = np.nanpercentile(speed, speed_pct)
+
+    win = int(round(dur_sec * prate))
+    step = int(round(step_sec * prate))
+    best_t, best_score = 0.0, -1.0
+    for s0 in range(0, max(1, len(speed) - win), step):
+        seg = speed[s0:s0 + win]
+        m = np.isfinite(seg)
+        if m.mean() < min_valid:
+            continue
+        score = float((seg[m] > thr).mean())
+        if score > best_score:
+            best_t, best_score = pt0 + s0 / prate, score
+    return best_t, best_t + dur_sec, best_score
+
+
+# --------------------------------------------------------------------------- #
+# Electrode anatomy -> sensorimotor channel selection
+# --------------------------------------------------------------------------- #
+# AAL regions that make up sensorimotor cortex (hand/arm + face motor + SMA).
+SENSORIMOTOR_AAL = ("Precentral", "Postcentral", "Rolandic_Oper",
+                    "Supp_Motor_Area", "Paracentral_Lobule")
+
+
+def electrode_coords(path):
+    """Return ``(xyz (n,3) MNI, good_mask (n,))`` for all electrodes."""
+    with h5py.File(path, "r") as f:
+        el = f["general/extracellular_ephys/electrodes"]
+        xyz = np.column_stack([el["x"][:], el["y"][:], el["z"][:]]).astype(float)
+        good = el["good"][:].astype(bool) if "good" in el else np.ones(len(xyz), bool)
+    return xyz, good
+
+
+def mni_to_aal(coords):
+    """Map ``(n,3)`` MNI coordinates -> list of AAL region-name strings.
+
+    Requires ``nilearn`` (one-time atlas download). SSL verification is relaxed
+    because the atlas host often fails strict verification on Windows.
+    """
+    import os
+    import ssl
+    try:
+        import certifi
+        os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+    except Exception:
+        pass
+    ssl._create_default_https_context = ssl._create_unverified_context
+
+    from nilearn import datasets, image
+
+    aal = datasets.fetch_atlas_aal()
+    img = image.load_img(aal.maps)
+    vol = np.asarray(img.get_fdata())
+    inv = np.linalg.inv(img.affine)
+    labels = list(aal.labels)
+    indices = [str(i) for i in aal.indices]
+
+    names = []
+    for x, y, z in coords:
+        vox = inv.dot([x, y, z, 1.0])[:3]
+        i, j, k = np.round(vox).astype(int)
+        name = "unknown"
+        if (0 <= i < vol.shape[0] and 0 <= j < vol.shape[1] and 0 <= k < vol.shape[2]):
+            val = int(vol[i, j, k])
+            if val != 0 and str(val) in indices:
+                name = labels[indices.index(str(val))]
+        names.append(name)
+    return names
+
+
+def sensorimotor_channels(path, good_only=True, regions=SENSORIMOTOR_AAL,
+                          fallback_box=True, verbose=True):
+    """Indices of (good) electrodes in sensorimotor cortex.
+
+    Primary: AAL region labels from MNI coords. Fallback (if nilearn/atlas fails):
+    a coordinate box around the central sulcus (lateral, peri-central, dorsal-ish).
+    """
+    xyz, good = electrode_coords(path)
+    pool = np.where(good)[0] if good_only else np.arange(len(xyz))
+
+    sel, method = [], ""
+    try:
+        names = mni_to_aal(xyz)
+        sel = [i for i in pool
+               if any(r.lower() in names[i].lower() for r in regions)]
+        method = "AAL"
+    except Exception as e:  # noqa: BLE001
+        method = "AAL-failed({})".format(type(e).__name__)
+
+    if not sel and fallback_box:
+        x, y, z = xyz[:, 0], xyz[:, 1], xyz[:, 2]
+        box = (np.abs(x) >= 25) & (y >= -40) & (y <= 15) & (z >= 15)
+        sel = [i for i in pool if box[i]]
+        method += "+coord_box"
+
+    sel = np.array(sorted(set(sel)), dtype=int)
+    if verbose:
+        print("sensorimotor channels: {}/{} selected via {}".format(
+            len(sel), len(pool), method))
+    return sel
+
+
+def build_continuous_stream(path, t_start, t_stop, out_rate=30.0,
+                            bands=("high_gamma",), ecog_channels="good",
+                            pose_keypoints=("R_Wrist", "L_Wrist"),
+                            zscore=True, smooth_hz=6.0, block_sec=60.0,
+                            pad_sec=2.0, order=4, verbose=True):
+    """Build time-aligned continuous arrays over ``[t_start, t_stop)`` for CEBRA.
+
+    The ECoG band-power envelope is computed *chunked* (overlap-and-discard) so
+    the 15 GB file is never loaded whole, then resampled to ``out_rate`` and put
+    on a common time grid with wrist kinematics and behavior labels.
+
+    Returns a dict with:
+        t          (T,)            time vector (s)
+        X          (T, C)          z-scored band-power envelope (C = n_ch*n_bands)
+        vel        (T, 2*K)        wrist velocity (dx,dy per keypoint) -- CEBRA aux
+        speed      (T, K)          wrist speed magnitude per keypoint
+        pos        (T, 2*K)        wrist position (interpolated over occlusions)
+        reach      (T,)  int       1 inside a reach interval, else 0
+        behavior   (T,)  object    coarse-behavior label per sample ('' if none)
+        channels, feature_names, keypoints, fs, out_rate
+    """
+    bands = tuple(bands)
+    for b in bands:
+        if b not in BANDS:
+            raise ValueError("Unknown band '{}'. Options: {}".format(b, list(BANDS)))
+
+    t_grid = np.arange(t_start, t_stop, 1.0 / out_rate)
+    T = t_grid.size
+
+    with h5py.File(path, "r") as f:
+        fs, ecog_t0 = _series_rate(f, "acquisition/ElectricalSeries", 500.0)
+        conv = float(f["acquisition/ElectricalSeries/data"].attrs.get("conversion", 1.0))
+        n_samp = f["acquisition/ElectricalSeries/data"].shape[0]
+        if isinstance(ecog_channels, str) and ecog_channels == "good":
+            channels = good_channel_indices(f)
+        elif isinstance(ecog_channels, str) and ecog_channels == "all":
+            channels = np.arange(f["acquisition/ElectricalSeries/data"].shape[1])
+        else:
+            channels = np.unique(np.asarray(ecog_channels, dtype=int))
+        nyq = fs / 2.0
+
+        # Pre-build band SOS filters.
+        sos_by_band = {}
+        for b in bands:
+            lo, hi = BANDS[b]
+            hi = min(hi, nyq - 1)
+            sos_by_band[b] = butter(order, [lo / nyq, hi / nyq], btype="band", output="sos")
+        sos_smooth = butter(2, min(smooth_hz, nyq - 1) / nyq, btype="low", output="sos")
+
+        C = len(channels) * len(bands)
+        X = np.full((T, C), np.nan, dtype=np.float32)
+
+        # ---- chunked envelope extraction (overlap-and-discard) ----------- #
+        pad = int(round(pad_sec * fs))
+        cur = t_start
+        while cur < t_stop:
+            ba, bb = cur, min(cur + block_sec, t_stop)
+            s0 = max(0, int(round((ba - ecog_t0) * fs)) - pad)
+            s1 = min(n_samp, int(round((bb - ecog_t0) * fs)) + pad)
+            if s1 - s0 < 10:
+                cur = bb
+                continue
+            raw = f["acquisition/ElectricalSeries/data"][s0:s1, channels].astype(np.float64)
+            raw = raw * conv
+            raw = raw - raw.mean(axis=0, keepdims=True)
+            local_t = ecog_t0 + np.arange(s0, s1) / fs
+            mask = (t_grid >= ba) & (t_grid < bb)
+            tgt = t_grid[mask]
+            if tgt.size == 0:
+                cur = bb
+                continue
+            for bi, b in enumerate(bands):
+                filt = sosfiltfilt(sos_by_band[b], raw, axis=0)
+                env = np.abs(hilbert(filt, axis=0))
+                env = sosfiltfilt(sos_smooth, env, axis=0)
+                env = np.clip(env, 0, None)
+                for ci in range(len(channels)):
+                    col = ci * len(bands) + bi
+                    X[mask, col] = np.interp(tgt, local_t, env[:, ci]).astype(np.float32)
+            if verbose:
+                print("  ecog block {:.0f}-{:.0f}s done".format(ba, bb))
+            cur = bb
+
+        # ---- pose -> position / velocity on the common grid ------------- #
+        pos_parts, vel_parts, speed_parts, kps = [], [], [], []
+        posg = f.get("processing/behavior/Position")
+        if posg is not None:
+            for kp in pose_keypoints:
+                if kp not in posg:
+                    continue
+                prate, pt0 = _series_rate(f, "processing/behavior/Position/" + kp, 30.0)
+                d = posg[kp + "/data"]
+                p0 = max(0, int(round((t_start - pt0) * prate)) - 1)
+                p1 = min(d.shape[0], int(round((t_stop - pt0) * prate)) + 2)
+                arr = _interp_nan(d[p0:p1, :])
+                ptimes = pt0 + np.arange(p0, p1) / prate
+                xy = np.column_stack([np.interp(t_grid, ptimes, arr[:, k])
+                                      for k in range(arr.shape[1])])
+                v = np.gradient(xy, 1.0 / out_rate, axis=0)
+                pos_parts.append(xy)
+                vel_parts.append(v)
+                speed_parts.append(np.sqrt((v ** 2).sum(axis=1)))
+                kps.append(kp)
+
+        # ---- labels: reach mask + coarse behavior per sample ------------ #
+        reach = np.zeros(T, dtype=np.int64)
+        reaches = _read_intervals(f, "reaches")
+        if reaches is not None and "stop_time" in reaches:
+            for s, e in zip(reaches["start_time"], reaches["stop_time"]):
+                reach[(t_grid >= float(s)) & (t_grid < float(e))] = 1
+
+        behavior = np.array([""] * T, dtype=object)
+        ep = _read_intervals(f, "epochs")
+        if ep is not None and "labels" in ep:
+            for s, e, lab in zip(ep["start_time"], ep["stop_time"], ep["labels"]):
+                behavior[(t_grid >= float(s)) & (t_grid < float(e))] = str(lab)
+
+    # ---- finalize ------------------------------------------------------- #
+    X = _interp_nan(X)  # fill any grid points missed at block seams
+    scaler = None
+    if zscore:
+        mu = X.mean(axis=0, keepdims=True)
+        sd = X.std(axis=0, keepdims=True) + 1e-8
+        X = (X - mu) / sd
+        scaler = (mu.squeeze(0), sd.squeeze(0))
+
+    feature_names = ["ch{}_{}".format(int(c), b) for c in channels for b in bands]
+    pos = np.concatenate(pos_parts, axis=1) if pos_parts else np.zeros((T, 0))
+    vel = np.concatenate(vel_parts, axis=1) if vel_parts else np.zeros((T, 0))
+    speed = np.column_stack(speed_parts) if speed_parts else np.zeros((T, 0))
+
+    return {
+        "t": t_grid, "X": X.astype(np.float32),
+        "vel": vel.astype(np.float32), "speed": speed.astype(np.float32),
+        "pos": pos.astype(np.float32), "reach": reach, "behavior": behavior,
+        "channels": np.asarray(channels), "feature_names": feature_names,
+        "keypoints": kps, "fs": fs, "out_rate": float(out_rate),
+        "bands": list(bands), "scaler": scaler,
+    }
