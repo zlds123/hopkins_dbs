@@ -1,0 +1,2 @@
+file,features,window,channels,best_win_s,best_win_auc,best_lag_s,best_lag_auc,mean_causal_cost,best_win_r2,best_lag_r2
+sub-01_ses-3_behavior+ecephys.nwb,band,reach(n=21),sensorimotor,0.35,0.6715175986906016,-0.4,0.7454612618936997,0.048674125397296986,-0.09084142541145286,-0.0941094192753619

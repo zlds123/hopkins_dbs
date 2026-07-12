@@ -446,24 +446,46 @@ def electrode_coords(path):
     return xyz, good
 
 
-def mni_to_aal(coords):
-    """Map ``(n,3)`` MNI coordinates -> list of AAL region-name strings.
-
-    Requires ``nilearn`` (one-time atlas download). SSL verification is relaxed
-    because the atlas host often fails strict verification on Windows.
-    """
+def _fetch_aal_atlas():
+    """Fetch AAL atlas; prefer locally cached SPM12, retry without TLS on failure."""
     import os
     import ssl
+    from nilearn import datasets
+
     try:
         import certifi
         os.environ.setdefault("SSL_CERT_FILE", certifi.where())
     except Exception:
         pass
-    ssl._create_default_https_context = ssl._create_unverified_context
 
-    from nilearn import datasets, image
+    # SPM12 bundle is often already cached and avoids the flaky AAL3v2 host.
+    spm12_nii = os.path.join(
+        os.path.expanduser("~"), "nilearn_data", "aal_SPM12", "aal", "atlas", "AAL.nii")
+    if os.path.isfile(spm12_nii):
+        try:
+            return datasets.fetch_atlas_aal(version="SPM12")
+        except Exception:
+            pass
 
-    aal = datasets.fetch_atlas_aal()
+    try:
+        return datasets.fetch_atlas_aal()
+    except Exception:
+        orig = ssl.create_default_context
+        ssl.create_default_context = lambda *a, **k: ssl._create_unverified_context()
+        ssl._create_default_https_context = ssl._create_unverified_context
+        try:
+            return datasets.fetch_atlas_aal(version="SPM12")
+        except Exception:
+            return datasets.fetch_atlas_aal()
+        finally:
+            ssl.create_default_context = orig
+
+
+def mni_to_aal(coords):
+    """Map ``(n,3)`` MNI coordinates -> list of AAL region-name strings."""
+    from nilearn import image
+
+    aal = _fetch_aal_atlas()
     img = image.load_img(aal.maps)
     vol = np.asarray(img.get_fdata())
     inv = np.linalg.inv(img.affine)

@@ -1,0 +1,37 @@
+target,representation,n_labels,test_auc
+reach,raw high-gamma,1512,0.5665
+reach,raw high-gamma,3780,0.5954
+reach,raw high-gamma,7560,0.6348
+reach,raw high-gamma,18900,0.6575
+reach,raw high-gamma,37800,0.6678
+reach,raw high-gamma,75600,0.6747
+reach,CEBRA-Time,1512,0.5991
+reach,CEBRA-Time,3780,0.6167
+reach,CEBRA-Time,7560,0.6090
+reach,CEBRA-Time,18900,0.6354
+reach,CEBRA-Time,37800,0.6236
+reach,CEBRA-Time,75600,0.6384
+reach,CEBRA-Behavior,1512,0.5615
+reach,CEBRA-Behavior,3780,0.5915
+reach,CEBRA-Behavior,7560,0.5963
+reach,CEBRA-Behavior,18900,0.5776
+reach,CEBRA-Behavior,37800,0.5937
+reach,CEBRA-Behavior,75600,0.5775
+move (top-25% speed),raw high-gamma,1512,0.5962
+move (top-25% speed),raw high-gamma,3780,0.6181
+move (top-25% speed),raw high-gamma,7560,0.6286
+move (top-25% speed),raw high-gamma,18900,0.6325
+move (top-25% speed),raw high-gamma,37800,0.6355
+move (top-25% speed),raw high-gamma,75600,0.6363
+move (top-25% speed),CEBRA-Time,1512,0.6218
+move (top-25% speed),CEBRA-Time,3780,0.6267
+move (top-25% speed),CEBRA-Time,7560,0.6241
+move (top-25% speed),CEBRA-Time,18900,0.6238
+move (top-25% speed),CEBRA-Time,37800,0.6228
+move (top-25% speed),CEBRA-Time,75600,0.6233
+move (top-25% speed),CEBRA-Behavior,1512,0.6181
+move (top-25% speed),CEBRA-Behavior,3780,0.6206
+move (top-25% speed),CEBRA-Behavior,7560,0.6205
+move (top-25% speed),CEBRA-Behavior,18900,0.6177
+move (top-25% speed),CEBRA-Behavior,37800,0.6175
+move (top-25% speed),CEBRA-Behavior,75600,0.6157

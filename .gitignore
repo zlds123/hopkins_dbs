@@ -2,6 +2,7 @@
 *.nwb
 *.h5
 *.hdf5
+*.npz
 
 # --- Third-party upstream repo (has its own git history) ---
 ajile12-nwb-data/

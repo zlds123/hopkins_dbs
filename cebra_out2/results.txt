@@ -1,0 +1,4 @@
+window=movement channels=sensorimotor T=54000 reach_frac=0.0000
+raw high-gamma: reach_AUC=nan move_AUC=0.5183 speed_R2=-0.4654
+CEBRA-Time: reach_AUC=nan move_AUC=0.4970 speed_R2=-0.4952
+CEBRA-Behavior: reach_AUC=nan move_AUC=0.5045 speed_R2=-0.5655

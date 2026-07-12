@@ -1,0 +1,3 @@
+logistic_raw_highgamma_AUC=0.6747
+knn_cebra_time_AUC=0.6384
+knn_cebra_behavior_AUC=0.5775
