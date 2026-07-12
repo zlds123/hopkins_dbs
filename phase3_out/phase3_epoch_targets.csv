@@ -1,0 +1,3 @@
+target,model,metric,value
+T5,M0,macro_auc_ovr,0.8705679978900213
+T6,M0,auc,0.9999073344762082

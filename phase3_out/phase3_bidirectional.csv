@@ -1,0 +1,3 @@
+direction,metric,value
+z_b->T1(reach),auc,0.7406157956836592
+z_b->neuralPCA(k=8),r2,-0.09704211354255676

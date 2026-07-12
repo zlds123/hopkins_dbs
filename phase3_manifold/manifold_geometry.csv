@@ -1,0 +1,3 @@
+manifold,n_samples,n_features,outliers_dropped,participation_ratio,embed,silhouette_embed,n_categories
+state,895,425,1,2.59,UMAP,0.135,6
+movement,80805,10,195,4.81,UMAP,-0.023,2

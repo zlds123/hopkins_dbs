@@ -3,6 +3,7 @@
 *.h5
 *.hdf5
 *.npz
+*.pt
 
 # --- Third-party upstream repo (has its own git history) ---
 ajile12-nwb-data/
@@ -22,6 +23,10 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# --- Transient run logs & smoke-test outputs ---
+*.log
+*_smoke/
 
 # --- OS / editor cruft ---
 .DS_Store

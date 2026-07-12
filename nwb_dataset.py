@@ -147,9 +147,9 @@ class WindowedNWBDataset:
             self.ecog_rate, self.ecog_t0 = _series_rate(f, "acquisition/ElectricalSeries", 500.0)
             self.ecog_conv = float(f["acquisition/ElectricalSeries/data"].attrs.get("conversion", 1.0))
             self.n_ecog = f["acquisition/ElectricalSeries/data"].shape[0]
-            if ecog_channels == "good":
+            if isinstance(ecog_channels, str) and ecog_channels == "good":
                 self.channels = good_channel_indices(f)
-            elif ecog_channels == "all":
+            elif isinstance(ecog_channels, str) and ecog_channels == "all":
                 self.channels = np.arange(f["acquisition/ElectricalSeries/data"].shape[1])
             else:
                 self.channels = np.asarray(ecog_channels, dtype=int)

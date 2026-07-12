@@ -1,0 +1,7 @@
+axis,band,loading_fraction
+sleep_vs_active,alpha,0.2623
+sleep_vs_active,beta,0.2583
+sleep_vs_active,low_gamma,0.1828
+sleep_vs_active,high_gamma,0.1645
+sleep_vs_active,theta,0.1321
+sleep_vs_active,__AUC__,0.9951
