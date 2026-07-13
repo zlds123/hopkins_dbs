@@ -52,6 +52,7 @@ def main():
 
     path = args.nwb or find_default_file()
     os.makedirs(args.out_dir, exist_ok=True)
+    sid = os.path.basename(path).split("_")[0].replace("sub-", "")
     with __import__("h5py").File(path, "r") as f:
         good = good_channel_indices(f)
 
@@ -90,7 +91,7 @@ def main():
     false_on = int(trig[active_idx].sum())
     fa_per_h = false_on / active_span_h if active_span_h > 0 else float("nan")
 
-    print("\n================ CLOSED-LOOP FEASIBILITY ================")
+    print("\n================ CLOSED-LOOP FEASIBILITY (sub-{}) ================".format(sid))
     print("biomarker AUC (sleep vs active)        {:.3f}".format(auc))
     print("trigger thresholds  hi={:.2f}  lo={:.2f}  (hysteresis)".format(hi, lo))
     print("sensitivity (sleep flagged)            {:.1%}".format(sensitivity))
@@ -123,7 +124,7 @@ def main():
         ax.legend(loc="upper right", fontsize=8, ncol=2)
         ax.grid(alpha=.25)
         fig.tight_layout()
-        out = os.path.join(args.out_dir, "closedloop_sim.png")
+        out = os.path.join(args.out_dir, "closedloop_sim_sub{}.png".format(sid))
         fig.savefig(out, dpi=130)
         plt.close(fig)
         print("wrote", out)
