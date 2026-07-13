@@ -531,14 +531,17 @@ top wts  ch70 alpha <span style="color:var(--neg);">-35.2</span>   ch71 alpha <s
   <!-- FRONTIER -->
   <section>
     <div class="sechead">
-      <h2>The open frontier</h2>
-      <p>What each result points to next.</p>
+      <h2>What to try next</h2>
+      <p>In plain terms &mdash; some run on the data we already have, some need more.</p>
     </div>
     <div class="frontier">
       <ul>
-        <li><span class="q">Q1</span><div><b>The neural lingua franca.</b> Tested across <b>3 subject pairs and refuted</b>: none beats a label-shuffle null (p=0.70/0.24/0.34). On this data the state <em>geometry</em> is not shared across brains — the LLM-style shared-space analogy does not hold here. What <em>does</em> transfer is the biomarker's α/β spectral signature. Open question for larger cohorts, but a clean negative now.</div></li>
-        <li><span class="q">Q2</span><div><b>Biomarker → control. <span style="color:var(--ok);">Done (feasibility).</span></b> The biomarker triggers the target state at 96% sensitivity / 98.9% specificity, 0.5-min latency, 0.5 false-alarms/hour. Next: real pathological targets and actual stimulation, not a labeled proxy state.</div></li>
-        <li><span class="q">Q3</span><div><b>Powered transfer.</b> More subjects + fine-tuning to test whether cross-subject decoding clears chance once the manifold, not the channels, is the shared object.</div></li>
+        <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Make the biomarker transfer between patients.</b> The α/β signal is shared even though the brain-map isn&rsquo;t &mdash; so match up the same brain regions across patients and test whether an arousal readout trained on two patients works on a third. If it does, we have a biomarker that carries over to new people (the right kind of transfer, at the feature level).</div></li>
+        <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Check if the arousal signal follows a daily rhythm.</b> Track the biomarker smoothly across the full 24 hours instead of in chunks. A gentle rise-and-fall over the day (not just one sleep block) would be a genuinely new result, and it lines up with how circadian rhythm matters in psychiatric stimulation.</div></li>
+        <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Explain why the learned model didn&rsquo;t help.</b> Feed the two-tower the raw signal instead of the pre-computed band-power. If alignment only helps then, it shows the simple features already captured everything &mdash; turning a negative into a clear lesson about when learned models add value.</div></li>
+        <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Give the biomarker a physiological story.</b> It&rsquo;s a local alpha difference between two neighbouring electrodes &mdash; pin down what that is (an arousal/idling rhythm), so it&rsquo;s more than a set of weights.</div></li>
+        <li><span class="q" style="color:var(--muted);">more</span><div><b>Graded control, not just on/off.</b> The six behavioral states separate too (0.87), so the readout could adjust stimulation by degree rather than a simple trigger &mdash; closer to a real device.</div></li>
+        <li><span class="q" style="color:var(--muted);">more</span><div><b>More patients, then clinical data.</b> Download more subjects to properly power the transfer tests, and take the whole pipeline to psychiatric recordings where the slow states are the real target and labels are scarce &mdash; the payoff that matters.</div></li>
       </ul>
     </div>
   </section>
