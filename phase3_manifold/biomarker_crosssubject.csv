@@ -1,3 +1,4 @@
 subject,auc,n_windows,top_band,top_region,sensorimotor_frac
 01,0.995,895,alpha,unknown,0.06
+06,0.961,716,beta,unknown,0.0
 07,0.969,345,alpha,unknown,0.21

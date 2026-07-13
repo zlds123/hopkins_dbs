@@ -449,8 +449,11 @@ def build_epoch_dataset(path, channels, bands, window_sec=10.0, max_per_label=15
     band_dict = {b: BANDS[b] for b in bands}
     X, y, t0s = [], [], []
     n = len(ds)
+    min_len = int(0.5 * window_sec * ds.ecog_rate)  # skip windows clamped short (past ECoG coverage)
     for i in range(n):
         s = ds[i]
+        if s["ecog"].shape[0] < min_len:
+            continue  # epoch annotated beyond the ECoG recording -> degenerate window
         if not np.all(np.isfinite(s["ecog"])):
             continue
         vec, _ = extract_features(s, s["fs"], bands=band_dict, include_pose=False)
