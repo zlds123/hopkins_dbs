@@ -594,6 +594,36 @@ top wts  ch70 alpha <span style="color:var(--neg);">-35.2</span>   ch71 alpha <s
     </div>
   </section>
 
+  <!-- NOVELTY -->
+  <section>
+    <div class="sechead">
+      <h2>Novelty and prior work</h2>
+      <p>Positioned within cross-individual decoding of naturalistic behavioral state from intracranial signals.</p>
+    </div>
+    <div class="reframe" style="background: var(--panel);">
+      <p style="margin:0 0 8px; font-family:var(--sans); font-size:11px; font-weight:650; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);">Established</p>
+      <ul style="margin:0 0 16px; padding-left:20px; display:grid; gap:9px; color:var(--ink-soft); font-size:14px;">
+        <li><b>Naturalistic state decodes from spectro-spatial band-power, within subject.</b> The same five bands, linear classifier, and AJILE12 data show that the discriminative features are <em>consistent across patients</em> [1], but no decoder trained on a subset of patients was tested on a held-out patient; affective state from band-power was likewise shown within subject [2].</li>
+        <li><b>Cross-patient transfer that succeeds relies on deep, aligned models.</b> HTNet (a CNN with learned anatomical region-projection and fine-tuning) transfers movement decoders [3]; montage-agnostic foundation models [4] and adversarial/contrastive domain-adaptation methods [5] absorb electrode variability with learned encoders, largely for movement or cued tasks.</li>
+        <li><b>Patient-agnostic biomarkers remain an open problem in closed-loop DBS.</b> Mood biomarkers are heterogeneous across patients and are presently identified per patient [6, 7]; biomarkers that generalize without patient-specific calibration are not established.</li>
+      </ul>
+      <p style="margin:0 0 12px; padding:13px 16px; border-radius:10px; background: color-mix(in srgb, var(--ok) 10%, var(--panel-2)); border:1px solid color-mix(in srgb, var(--ok) 30%, var(--hair)); color:var(--ink); font-size:14.5px;"><b>Contribution.</b> To our knowledge, this is the first demonstration that a channel-agnostic spectral summary supports <b>zero-shot cross-patient decoding of naturalistic behavioral state</b> in human ECoG &mdash; without electrode registration, learned alignment, or fine-tuning &mdash; with an interpretable &alpha;/&beta; arousal axis. It bridges the established &ldquo;consistent features&rdquo; result to an actual transferable decoder, using a substantially simpler method than the deep cross-subject literature.</p>
+      <p style="margin:0; color:var(--muted); font-size:13.5px;"><b>Scope.</b> Partial transfer (mean 0.72 AUC, binary sleep-vs-active target) across three patients &mdash; a pilot. HTNet already established that movement decoders transfer; the contribution here is the target (naturalistic state), the zero-shot simplicity, and interpretability, not that cross-subject transfer is possible in principle.</p>
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--hair);">
+        <p style="margin:0 0 7px; font-family:var(--sans); font-size:11px; font-weight:650; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);">References</p>
+        <ol class="mono" style="margin:0; padding-left:20px; display:grid; gap:5px; font-size:11.5px; color:var(--ink-soft); line-height:1.5;">
+          <li>Consistent spectro-spatial features of human ECoG decode naturalistic behavioral states. <em>Front. Hum. Neurosci.</em> 2024. <a href="https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2024.1388267/full">link</a></li>
+          <li>Naturalistic affective behaviors decoded from spectro-spatial features of multi-day human intracranial recordings. <em>bioRxiv</em> 2020. <a href="https://www.biorxiv.org/content/10.1101/2020.11.26.400374v1.full">link</a></li>
+          <li>Peterson, Rao &amp; Brunton. Generalized neural decoders for transfer learning across participants and recording modalities (HTNet). <em>J. Neural Eng.</em> 2021. <a href="https://iopscience.iop.org/article/10.1088/1741-2552/abda0b">link</a></li>
+          <li>LUNA: a topology-agnostic foundation model for EEG signal analysis. <em>arXiv</em> 2025. <a href="https://arxiv.org/html/2510.22257v1">link</a></li>
+          <li>Cross-subject generalization for EEG decoding: a survey of deep learning methods. <em>arXiv</em> 2024. <a href="https://arxiv.org/html/2604.27033v1">link</a></li>
+          <li>Closing the loop in psychiatric deep brain stimulation: physiology, psychometrics, and plasticity. 2023. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10700701/">link</a></li>
+          <li>Scangos et al. Closed-loop neuromodulation in an individual with treatment-resistant depression. <em>Nat. Med.</em> 2021. <a href="https://www.nature.com/articles/s41591-021-01480-w">link</a></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
   <!-- GLOSSARY -->
   <section>
     <div class="sechead">
