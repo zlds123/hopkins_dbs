@@ -231,6 +231,31 @@
         <div class="card" style="box-shadow:none;"><p class="who" style="font-size:14px;">2 &middot; It can drive a device</p><p class="what" style="margin:0;">As a closed-loop trigger it fires reliably in all three (sensitivity 90&ndash;96%, &le;0.5 false-alarms/hour).</p></div>
         <div class="card" style="box-shadow:none; border-color: color-mix(in srgb, var(--ok) 40%, var(--hair));"><p class="who" style="font-size:14px; color:var(--ok);">3 &middot; It transfers (new)</p><p class="what" style="margin:0;">Trained on two patients and tested on a third with <b>zero calibration</b>, it reads the unseen patient at <b>AUC 0.72</b> &mdash; the only cross-patient result that beats chance.</p></div>
       </div>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:16px; margin:16px 0 4px;">
+        <div>
+          <p class="eyebrow" style="margin:0 0 6px;">Leave-one-patient-out transfer</p>
+          <div class="tablewrap"><table style="min-width:0;">
+            <thead><tr><th>Held-out patient</th><th>Zero-shot AUC</th><th>Within-patient ceiling</th></tr></thead>
+            <tbody>
+              <tr><td>sub-01</td><td><span class="mono">0.700</span></td><td><span class="mono">0.998</span></td></tr>
+              <tr><td>sub-06</td><td><span class="mono">0.666</span></td><td><span class="mono">0.910</span></td></tr>
+              <tr><td>sub-07</td><td><span class="mono">0.783</span></td><td><span class="mono">0.966</span></td></tr>
+              <tr><td><b>mean</b></td><td><span class="mono" style="color:var(--ok);"><b>0.716</b></span></td><td><span class="mono">~0.96</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div>
+          <p class="eyebrow" style="margin:0 0 6px;">What is shared across brains?</p>
+          <div class="tablewrap"><table style="min-width:0;">
+            <thead><tr><th>Approach</th><th>Cross-patient AUC</th></tr></thead>
+            <tbody>
+              <tr><td>Raw electrode channels</td><td><span class="mono">0.49 (chance)</span></td></tr>
+              <tr><td>Manifold <em>geometry</em></td><td><span class="mono">0/3 pairs beat null</span></td></tr>
+              <tr><td>&alpha;/&beta; spectral summary</td><td><span class="mono" style="color:var(--ok);">0.72 (works)</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
       <p style="margin:14px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:74ch;">The contrast is the point: raw channels transfer at chance (0.49) and the manifold <em>shape</em> does not transfer at all (0/3 pairs), but a channel-agnostic <b>spectral summary</b> does (0.72, zero-shot, with room to climb toward the ~0.96 within-patient ceiling with light per-patient calibration). What is shared across brains is the <b>feature</b>, not the geometry &mdash; a narrow, testable, clinically-relevant claim to build the next phase on.</p>
     </div>
   </section>
