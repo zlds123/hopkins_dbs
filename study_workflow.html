@@ -207,6 +207,7 @@
       <span class="chip"><span class="dot" style="background:var(--accent)"></span>Dataset: AJILE12 · human ECoG + pose</span>
       <span class="chip"><span class="dot" style="background:var(--violet)"></span>N = 4 subjects local (1 primary + 3 downloaded)</span>
       <span class="chip">Translational target: psychiatric closed-loop DBS</span>
+      <span class="chip" style="color:var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent);">Analysis ~Jul 11 &middot; focused-direction update Jul 16 (below &darr;)</span>
     </div>
   </header>
 
@@ -217,49 +218,6 @@
       <p style="margin:0; font-size:15px; color:var(--ink-soft); max-width:74ch;">Scientists already knew you can read movement &mdash; and even coarse activity like sleep vs.&nbsp;talking &mdash; from the brain&rsquo;s surface, but decoders are built per-patient and biomarkers are found by hand, which matters because psychiatric brain implants must track <b>slow states from very few labels</b>. This project worked through four questions. <b>Timing:</b> movement is most readable in a brief ~0.2-second window, the brain leads the behavior by about half a second, and forcing real-time (causal-only) decoding costs accuracy &mdash; a concrete latency budget for an implant. <b>Drift:</b> within a single session the signal barely drifts, so a frozen decoder holds up and an adaptive one only helps when drift is deliberately introduced &mdash; telling you short-term use may not need constant retraining while multi-day use will. <b>Learned alignment:</b> I expected a model that aligns brain to behavior to beat hand-crafted frequency-band features &mdash; it did not, at either plentiful or scarce labels, and fine hand-motion speed couldn&rsquo;t be read at all; that negative is useful because it says simple band-power is already near the ceiling for single-session motor decoding, so effort belongs elsewhere. The turn came from ignoring accuracy and looking at <b>geometry</b>: brain activity collapses onto a ~2&ndash;3-dimensional landscape, and on it a simple, interpretable <b>&alpha;/&beta; &ldquo;arousal&rdquo; biomarker</b> separates rest from engagement (AUC&nbsp;&asymp;&nbsp;0.99) in every patient with data, works as a <b>closed-loop trigger</b> in simulation (96% sensitivity, ~0.5 false-alarms/hour), and &mdash; read with a multi-class model &mdash; separates all six behavioral states. Two claims did not survive their tests, and each failure is informative: the biomarker didn&rsquo;t transfer to a new patient as a plug-in decoder, which points to electrode placement as the obstacle and to anatomy-aware or per-patient calibration as the fix; and the idea that the brain&rsquo;s state-map has the same <em>shape</em> across people was refuted (0 of 3 patient pairs beat a chance baseline), so what actually travels across patients is the biomarker&rsquo;s &alpha;/&beta; spectral signature, not its geometry. So the contribution isn&rsquo;t &ldquo;we can decode the brain&rdquo; &mdash; that&rsquo;s established &mdash; but a reframe toward an interpretable, low-dimensional arousal biomarker that behaves like a closed-loop control signal, bounded by clear negatives that mark where the real difficulty &mdash; cross-patient generalization &mdash; lives, useful groundwork for psychiatric deep-brain stimulation.</p>
     </div>
   </section>
-
-
-
-  <!-- FOCUSED DIRECTION -->
-  <section>
-    <div class="reframe" style="background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 9%, var(--panel)), var(--panel)); border-color: color-mix(in srgb, var(--ok) 34%, var(--hair));">
-      <p class="eyebrow" style="margin-bottom:10px; color:var(--ok);">The focused direction &mdash; one thing, not ten</p>
-      <p class="k" style="font-size:clamp(18px,2.3vw,23px); margin:0 0 10px; color:var(--ink);">A single interpretable arousal biomarker that transfers across patients.</p>
-      <p style="margin:0 0 14px; color:var(--ink-soft); font-size:14.5px; max-width:74ch;">In response to the note that the project tried too many things, everything narrows to one question with a clinical payoff: <b>is there one cortical readout of arousal that works the same way in a new patient, without retraining?</b> Three pieces of evidence say it is worth pursuing &mdash; and the third is new:</p>
-      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;">
-        <div class="card" style="box-shadow:none;"><p class="who" style="font-size:14px;">1 &middot; Same signal in every patient</p><p class="what" style="margin:0;">An &alpha;/&beta; readout separates rest from engagement at AUC 0.91&ndash;0.998 in all three patients &mdash; the same spectral signature each time.</p></div>
-        <div class="card" style="box-shadow:none;"><p class="who" style="font-size:14px;">2 &middot; It can drive a device</p><p class="what" style="margin:0;">As a closed-loop trigger it fires reliably in all three (sensitivity 90&ndash;96%, &le;0.5 false-alarms/hour).</p></div>
-        <div class="card" style="box-shadow:none; border-color: color-mix(in srgb, var(--ok) 40%, var(--hair));"><p class="who" style="font-size:14px; color:var(--ok);">3 &middot; It transfers (new)</p><p class="what" style="margin:0;">Trained on two patients and tested on a third with <b>zero calibration</b>, it reads the unseen patient at <b>AUC 0.72</b> &mdash; the only cross-patient result that beats chance.</p></div>
-      </div>
-            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:16px; margin:16px 0 4px;">
-        <div>
-          <p class="eyebrow" style="margin:0 0 6px;">Leave-one-patient-out transfer</p>
-          <div class="tablewrap"><table style="min-width:0;">
-            <thead><tr><th>Held-out patient</th><th>Zero-shot AUC</th><th>Within-patient ceiling</th></tr></thead>
-            <tbody>
-              <tr><td>sub-01</td><td><span class="mono">0.700</span></td><td><span class="mono">0.998</span></td></tr>
-              <tr><td>sub-06</td><td><span class="mono">0.666</span></td><td><span class="mono">0.910</span></td></tr>
-              <tr><td>sub-07</td><td><span class="mono">0.783</span></td><td><span class="mono">0.966</span></td></tr>
-              <tr><td><b>mean</b></td><td><span class="mono" style="color:var(--ok);"><b>0.716</b></span></td><td><span class="mono">~0.96</span></td></tr>
-            </tbody>
-          </table></div>
-        </div>
-        <div>
-          <p class="eyebrow" style="margin:0 0 6px;">What is shared across brains?</p>
-          <div class="tablewrap"><table style="min-width:0;">
-            <thead><tr><th>Approach</th><th>Cross-patient AUC</th></tr></thead>
-            <tbody>
-              <tr><td>Raw electrode channels</td><td><span class="mono">0.49 (chance)</span></td></tr>
-              <tr><td>Manifold <em>geometry</em></td><td><span class="mono">0/3 pairs beat null</span></td></tr>
-              <tr><td>&alpha;/&beta; spectral summary</td><td><span class="mono" style="color:var(--ok);">0.72 (works)</span></td></tr>
-            </tbody>
-          </table></div>
-        </div>
-      </div>
-      <p style="margin:14px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:74ch;">The contrast is the point: raw channels transfer at chance (0.49) and the manifold <em>shape</em> does not transfer at all (0/3 pairs), but a channel-agnostic <b>spectral summary</b> does (0.72, zero-shot, with room to climb toward the ~0.96 within-patient ceiling with light per-patient calibration). What is shared across brains is the <b>feature</b>, not the geometry &mdash; a narrow, testable, clinically-relevant claim to build the next phase on.</p>
-    </div>
-  </section>
-
   <!-- LANDSCAPE -->
   <section>
     <div class="sechead">
@@ -584,6 +542,55 @@ top wts  ch70 alpha <span style="color:var(--neg);">-35.2</span>   ch71 alpha <s
         <li><span class="q" style="color:var(--muted);">more</span><div><b>Graded control, not just on/off.</b> The six behavioral states separate too (0.87), so the readout could adjust stimulation by degree rather than a simple trigger &mdash; closer to a real device.</div></li>
         <li><span class="q" style="color:var(--muted);">more</span><div><b>More patients, then clinical data.</b> Download more subjects to properly power the transfer tests, and take the whole pipeline to psychiatric recordings where the slow states are the real target and labels are scarce &mdash; the payoff that matters.</div></li>
       </ul>
+    </div>
+  </section>
+
+  <!-- UPDATE 2026-07-16 -->
+  <section>
+    <div style="border-top: 3px solid color-mix(in srgb, var(--ok) 45%, var(--hair)); padding-top: 26px; margin-top: 18px;">
+      <p class="eyebrow" style="color:var(--ok); margin-bottom:8px;">Update &middot; July 16, 2026</p>
+      <h2 style="font-family:var(--serif); font-size:clamp(20px,2.6vw,27px); margin:0 0 8px;">Focused direction, after mentor feedback</h2>
+      <p style="margin:0; color:var(--muted); font-size:14px; max-width:64ch;">The analysis above (through ~July 11) mapped four phases broadly. The feedback was that it tried to do too much. This update narrows everything to one testable, clinically-relevant claim &mdash; with a new cross-patient transfer result as first evidence.</p>
+    </div>
+  </section>
+
+  <!-- FOCUSED DIRECTION -->
+  <section>
+    <div class="reframe" style="background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 9%, var(--panel)), var(--panel)); border-color: color-mix(in srgb, var(--ok) 34%, var(--hair));">
+      <p class="eyebrow" style="margin-bottom:10px; color:var(--ok);">The focused direction &mdash; one thing, not ten</p>
+      <p class="k" style="font-size:clamp(18px,2.3vw,23px); margin:0 0 10px; color:var(--ink);">A single interpretable arousal biomarker that transfers across patients.</p>
+      <p style="margin:0 0 14px; color:var(--ink-soft); font-size:14.5px; max-width:74ch;">In response to the note that the project tried too many things, everything narrows to one question with a clinical payoff: <b>is there one cortical readout of arousal that works the same way in a new patient, without retraining?</b> Three pieces of evidence say it is worth pursuing &mdash; and the third is new:</p>
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;">
+        <div class="card" style="box-shadow:none;"><p class="who" style="font-size:14px;">1 &middot; Same signal in every patient</p><p class="what" style="margin:0;">An &alpha;/&beta; readout separates rest from engagement at AUC 0.91&ndash;0.998 in all three patients &mdash; the same spectral signature each time.</p></div>
+        <div class="card" style="box-shadow:none;"><p class="who" style="font-size:14px;">2 &middot; It can drive a device</p><p class="what" style="margin:0;">As a closed-loop trigger it fires reliably in all three (sensitivity 90&ndash;96%, &le;0.5 false-alarms/hour).</p></div>
+        <div class="card" style="box-shadow:none; border-color: color-mix(in srgb, var(--ok) 40%, var(--hair));"><p class="who" style="font-size:14px; color:var(--ok);">3 &middot; It transfers (new)</p><p class="what" style="margin:0;">Trained on two patients and tested on a third with <b>zero calibration</b>, it reads the unseen patient at <b>AUC 0.72</b> &mdash; the only cross-patient result that beats chance.</p></div>
+      </div>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:16px; margin:16px 0 4px;">
+        <div>
+          <p class="eyebrow" style="margin:0 0 6px;">Leave-one-patient-out transfer</p>
+          <div class="tablewrap"><table style="min-width:0;">
+            <thead><tr><th>Held-out patient</th><th>Zero-shot AUC</th><th>Within-patient ceiling</th></tr></thead>
+            <tbody>
+              <tr><td>sub-01</td><td><span class="mono">0.700</span></td><td><span class="mono">0.998</span></td></tr>
+              <tr><td>sub-06</td><td><span class="mono">0.666</span></td><td><span class="mono">0.910</span></td></tr>
+              <tr><td>sub-07</td><td><span class="mono">0.783</span></td><td><span class="mono">0.966</span></td></tr>
+              <tr><td><b>mean</b></td><td><span class="mono" style="color:var(--ok);"><b>0.716</b></span></td><td><span class="mono">~0.96</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div>
+          <p class="eyebrow" style="margin:0 0 6px;">What is shared across brains?</p>
+          <div class="tablewrap"><table style="min-width:0;">
+            <thead><tr><th>Approach</th><th>Cross-patient AUC</th></tr></thead>
+            <tbody>
+              <tr><td>Raw electrode channels</td><td><span class="mono">0.49 (chance)</span></td></tr>
+              <tr><td>Manifold <em>geometry</em></td><td><span class="mono">0/3 pairs beat null</span></td></tr>
+              <tr><td>&alpha;/&beta; spectral summary</td><td><span class="mono" style="color:var(--ok);">0.72 (works)</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+      <p style="margin:14px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:74ch;">The contrast is the point: raw channels transfer at chance (0.49) and the manifold <em>shape</em> does not transfer at all (0/3 pairs), but a channel-agnostic <b>spectral summary</b> does (0.72, zero-shot, with room to climb toward the ~0.96 within-patient ceiling with light per-patient calibration). What is shared across brains is the <b>feature</b>, not the geometry &mdash; a narrow, testable, clinically-relevant claim to build the next phase on.</p>
     </div>
   </section>
 
