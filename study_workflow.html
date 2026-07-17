@@ -219,6 +219,22 @@
   </section>
 
 
+
+  <!-- FOCUSED DIRECTION -->
+  <section>
+    <div class="reframe" style="background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 9%, var(--panel)), var(--panel)); border-color: color-mix(in srgb, var(--ok) 34%, var(--hair));">
+      <p class="eyebrow" style="margin-bottom:10px; color:var(--ok);">The focused direction &mdash; one thing, not ten</p>
+      <p class="k" style="font-size:clamp(18px,2.3vw,23px); margin:0 0 10px; color:var(--ink);">A single interpretable arousal biomarker that transfers across patients.</p>
+      <p style="margin:0 0 14px; color:var(--ink-soft); font-size:14.5px; max-width:74ch;">In response to the note that the project tried too many things, everything narrows to one question with a clinical payoff: <b>is there one cortical readout of arousal that works the same way in a new patient, without retraining?</b> Three pieces of evidence say it is worth pursuing &mdash; and the third is new:</p>
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;">
+        <div class="card" style="box-shadow:none;"><p class="who" style="font-size:14px;">1 &middot; Same signal in every patient</p><p class="what" style="margin:0;">An &alpha;/&beta; readout separates rest from engagement at AUC 0.91&ndash;0.998 in all three patients &mdash; the same spectral signature each time.</p></div>
+        <div class="card" style="box-shadow:none;"><p class="who" style="font-size:14px;">2 &middot; It can drive a device</p><p class="what" style="margin:0;">As a closed-loop trigger it fires reliably in all three (sensitivity 90&ndash;96%, &le;0.5 false-alarms/hour).</p></div>
+        <div class="card" style="box-shadow:none; border-color: color-mix(in srgb, var(--ok) 40%, var(--hair));"><p class="who" style="font-size:14px; color:var(--ok);">3 &middot; It transfers (new)</p><p class="what" style="margin:0;">Trained on two patients and tested on a third with <b>zero calibration</b>, it reads the unseen patient at <b>AUC 0.72</b> &mdash; the only cross-patient result that beats chance.</p></div>
+      </div>
+      <p style="margin:14px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:74ch;">The contrast is the point: raw channels transfer at chance (0.49) and the manifold <em>shape</em> does not transfer at all (0/3 pairs), but a channel-agnostic <b>spectral summary</b> does (0.72, zero-shot, with room to climb toward the ~0.96 within-patient ceiling with light per-patient calibration). What is shared across brains is the <b>feature</b>, not the geometry &mdash; a narrow, testable, clinically-relevant claim to build the next phase on.</p>
+    </div>
+  </section>
+
   <!-- LANDSCAPE -->
   <section>
     <div class="sechead">
@@ -536,7 +552,7 @@ top wts  ch70 alpha <span style="color:var(--neg);">-35.2</span>   ch71 alpha <s
     </div>
     <div class="frontier">
       <ul>
-        <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Make the biomarker transfer between patients.</b> The α/β signal is shared even though the brain-map isn&rsquo;t &mdash; so match up the same brain regions across patients and test whether an arousal readout trained on two patients works on a third. If it does, we have a biomarker that carries over to new people (the right kind of transfer, at the feature level).</div></li>
+        <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Make the biomarker transfer between patients. <span style="color:var(--ok);">First result: partial (0.72).</span></b> A channel-agnostic α/β readout trained on two patients reads a third, uncalibrated, at AUC 0.72 &mdash; above chance, and the only cross-patient signal that works. Next: add light per-patient calibration and more patients to push toward the within-patient ceiling.</div></li>
         <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Check if the arousal signal follows a daily rhythm.</b> Track the biomarker smoothly across the full 24 hours instead of in chunks. A gentle rise-and-fall over the day (not just one sleep block) would be a genuinely new result, and it lines up with how circadian rhythm matters in psychiatric stimulation.</div></li>
         <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Explain why the learned model didn&rsquo;t help.</b> Feed the two-tower the raw signal instead of the pre-computed band-power. If alignment only helps then, it shows the simple features already captured everything &mdash; turning a negative into a clear lesson about when learned models add value.</div></li>
         <li><span class="q" style="color:var(--accent-ink);">now</span><div><b>Give the biomarker a physiological story.</b> It&rsquo;s a local alpha difference between two neighbouring electrodes &mdash; pin down what that is (an arousal/idling rhythm), so it&rsquo;s more than a set of weights.</div></li>

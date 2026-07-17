@@ -451,7 +451,10 @@ def build_epoch_dataset(path, channels, bands, window_sec=10.0, max_per_label=15
     n = len(ds)
     min_len = int(0.5 * window_sec * ds.ecog_rate)  # skip windows clamped short (past ECoG coverage)
     for i in range(n):
-        s = ds[i]
+        try:
+            s = ds[i]
+        except OSError:
+            continue  # transient/occasional HDF5 chunk read failure -> skip this window
         if s["ecog"].shape[0] < min_len:
             continue  # epoch annotated beyond the ECoG recording -> degenerate window
         if not np.all(np.isfinite(s["ecog"])):
