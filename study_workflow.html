@@ -554,6 +554,26 @@ top wts  ch70 alpha <span style="color:var(--neg);">-35.2</span>   ch71 alpha <s
     </div>
   </section>
 
+  <!-- WHY THIS DIRECTION -->
+  <section>
+    <div class="sechead">
+      <h2>Why this direction</h2>
+      <p>Selected from the four-phase exploration by four criteria: positive evidence, novelty relative to prior work, clinical relevance, and feasibility with the available data.</p>
+    </div>
+    <div class="tablewrap"><table style="min-width:680px;">
+      <thead><tr><th>Thread explored</th><th>Outcome</th><th>Disposition as a focus</th></tr></thead>
+      <tbody>
+        <tr><td>Temporal resolution (timing)</td><td>Reproduced established window/lag/causal effects</td><td>Characterization; informs implant design, not a new direction on its own.</td></tr>
+        <tr><td>Online adaptation under drift</td><td>Inconclusive &mdash; within-session data are stationary</td><td>Deferred; requires cross-day or stimulation-logged data.</td></tr>
+        <tr><td>Learned multimodal alignment (two-tower, CEBRA)</td><td>No improvement over band-power</td><td>Bounded negative result; set aside.</td></tr>
+        <tr><td>Manifold geometry shared across patients</td><td>Refuted (0 of 3 pairs exceeded a null)</td><td>Geometry is not shared; not a transferable claim.</td></tr>
+        <tr><td>Interpretable state biomarker (within patient)</td><td>Effective, but established in prior work [1]</td><td>Necessary, but not novel in isolation.</td></tr>
+        <tr style="background: color-mix(in srgb, var(--ok) 10%, transparent);"><td><b>Cross-patient transfer of the biomarker</b></td><td><b>Positive (0.72), novel, feasible on current data</b></td><td><b>The focus &mdash; the only thread meeting all four criteria.</b></td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin:14px 0 0; color:var(--ink-soft); font-size:14px; max-width:74ch;">Only the cross-patient transfer thread satisfies all four criteria at once: it is the sole cross-patient result with <b>positive evidence</b>; it addresses a gap the prior literature left open (feature <em>consistency</em> was shown, but a <em>transferable decoder</em> was never tested); it targets an <b>open problem in closed-loop DBS</b> (patient-agnostic biomarkers); and it is <b>testable with the available data</b>. It is also narrow, addressing the concern that the four-phase scope was too broad.</p>
+  </section>
+
   <!-- FOCUSED DIRECTION -->
   <section>
     <div class="reframe" style="background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 9%, var(--panel)), var(--panel)); border-color: color-mix(in srgb, var(--ok) 34%, var(--hair));">
@@ -591,6 +611,7 @@ top wts  ch70 alpha <span style="color:var(--neg);">-35.2</span>   ch71 alpha <s
         </div>
       </div>
       <p style="margin:14px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:74ch;">The comparison is informative: raw channels transfer at chance (0.49) and the manifold <em>shape</em> does not transfer at all (0/3 pairs), but a channel-agnostic <b>spectral summary</b> does (0.72, zero-shot, with room to climb toward the ~0.96 within-patient ceiling with light per-patient calibration). What is shared across brains is the <b>feature</b>, not the geometry &mdash; a narrow, testable, clinically relevant basis for the next phase.</p>
+      <p style="margin:12px 0 0; color:var(--muted); font-size:13.5px;"><b>Bound.</b> Transfer is specific to the coarse arousal axis. A multi-state readout (3&ndash;5 classes) does <em>not</em> transfer across patients (leave-one-patient-out macro-AUC 0.44&ndash;0.54, at chance), although states separate well <em>within</em> patient (6-way macro-AUC 0.87). What generalizes across brains is rest-versus-engaged arousal, not activity type.</p>
     </div>
   </section>
 
