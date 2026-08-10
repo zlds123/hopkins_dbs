@@ -1,5 +1,12 @@
 # Prior work on AJILE12 — what's been done, and where this project is new
 
+> **Note:** this is a supplementary literature scan from 2026-07-12, kept as a detailed
+> reference (it covers two movement-decoding papers — Wang/Farhadi and Peterson et al.
+> eNeuro 2021 — not repeated elsewhere). It is **not** the project report and has not been
+> updated since the project's focus moved to the transferable arousal biomarker. **The
+> single, current, full report is [`study_workflow.html`](study_workflow.html)** (see its
+> "Novelty and prior work" section for the up-to-date positioning).
+
 Grounds mentor note #1 ("what have others done / not done with this data"). Citations
 below were located via literature search on 2026-07-12; **entries marked ⚠ still need a
 full-text read before citing in the writeup** — this is a map, not a substitute for
