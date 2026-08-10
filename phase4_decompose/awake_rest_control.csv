@@ -1,3 +1,3 @@
 contrast,mean_loso_auc
-Sleep_vs_Inactive (both motionless),0.807
-Inactive_vs_Engaged (both awake),0.3439
+Sleep_vs_Inactive (both motionless),0.8229
+Inactive_vs_Engaged (both awake),0.5286

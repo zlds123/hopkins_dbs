@@ -1,8 +1,8 @@
 bands,mean_loso_auc
-theta,0.524
-alpha,0.6577
-beta,0.8211
-low_gamma,0.5429
-high_gamma,0.5989
-alpha+beta,0.8296
-all_5_bands,0.7164
+theta,0.5967
+alpha,0.8314
+beta,0.7671
+low_gamma,0.5975
+high_gamma,0.4732
+alpha+beta,0.8291
+all_5_bands,0.7684

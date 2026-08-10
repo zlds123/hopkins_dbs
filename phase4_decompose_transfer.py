@@ -265,8 +265,21 @@ def _mean(aucs):
     return float(np.mean(vals)) if vals else float("nan")
 
 
+def within_patient_ceiling(feat, y, seed=0):
+    """Same-feature, same-target within-patient upper bound: random 70/30 split of one
+    patient's own windows, scored with the identical score() protocol used for LOSO. This
+    isolates the cross-patient transfer gap from any change in feature representation --
+    i.e. it answers "is the bottleneck cross-patient generalization, or decodability at
+    all," using the exact channel-agnostic feature the transfer test itself uses."""
+    rng = np.random.default_rng(seed)
+    idx = rng.permutation(len(y))
+    cut = int(0.7 * len(idx))
+    tr, te = idx[:cut], idx[cut:]
+    return score(feat[tr], y[tr], feat[te], y[te])
+
+
 def exp_granularity(cubes, ys):
-    print("\n=== A. Behavioral-granularity curve ===")
+    print("\n=== A. Behavioral-granularity curve (cross-patient LOSO vs. same-feature within-patient ceiling) ===")
     rows = []
     for level in ("L1_binary", "L2_3class", "L3_4class", "L4_full"):
         feat = {s: spectral_summary(cubes[s]) for s in cubes}
@@ -274,10 +287,16 @@ def exp_granularity(cubes, ys):
         n_classes = len(set.union(*[set(yg[s]) for s in yg]))
         aucs, dropped = loso(feat, yg)
         mean_auc = _mean(aucs)
-        print("  {:12s} (~{} classes): per-patient {}  mean LOSO = {:.3f}{}".format(
+
+        usable = usable_subjects(yg)
+        within_aucs = {s: within_patient_ceiling(feat[s], yg[s]) for s in usable}
+        mean_within = _mean(within_aucs)
+
+        print("  {:12s} (~{} classes): per-patient LOSO {}  mean LOSO = {:.3f}  |  mean within-patient (same feature) = {:.3f}{}".format(
             level, n_classes, {k: round(v, 3) for k, v in aucs.items() if np.isfinite(v)},
-            mean_auc, "  [excluded: {}]".format(dropped) if dropped else ""))
+            mean_auc, mean_within, "  [excluded: {}]".format(dropped) if dropped else ""))
         rows.append({"level": level, "n_classes": n_classes, "mean_loso_auc": round(mean_auc, 4),
+                    "mean_within_auc": round(mean_within, 4) if np.isfinite(mean_within) else "",
                     "excluded": ",".join(dropped),
                     **{"sub{}".format(k): round(v, 4) if np.isfinite(v) else "" for k, v in aucs.items()}})
     return rows
