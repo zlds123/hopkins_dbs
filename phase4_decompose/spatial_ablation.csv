@@ -1,0 +1,4 @@
+excluded,mean_loso_auc,n_features,representation
+04,0.7041,315,electrode_identity_naive
+04,0.3798,85,anatomical_roi
+04,0.7164,35,channel_agnostic
